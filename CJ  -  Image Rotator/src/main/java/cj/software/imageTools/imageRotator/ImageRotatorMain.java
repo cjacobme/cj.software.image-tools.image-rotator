@@ -1,5 +1,10 @@
 package cj.software.imageTools.imageRotator;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -14,7 +19,7 @@ public class ImageRotatorMain
 {
 	private Logger logger = LogManager.getFormatterLogger();
 
-	public static void main(String[] pArgs)
+	public static void main(String[] pArgs) throws IOException
 	{
 		Options lOptions = createOptions();
 		CommandLineParser lCLP = new DefaultParser();
@@ -58,10 +63,22 @@ public class ImageRotatorMain
 		lFormatter.printHelp(ImageRotatorMain.class.getName(), pOptions);
 	}
 
-	private void rotate(CommandLine pCommandLine)
+	private void rotate(CommandLine pCommandLine) throws IOException
 	{
 		String lSource = pCommandLine.getOptionValue("source");
 		String lDestination = pCommandLine.getOptionValue("destination");
 		this.logger.info("rotate source=%s, destination=%s", lSource, lDestination);
+
+		Path lSourcePath = Paths.get(lSource);
+		Path lDstnPath = Paths.get(lDestination);
+		ImageRotator lImageRotator = new ImageRotator();
+		if (Files.isDirectory(lSourcePath))
+		{
+			lImageRotator.rotateDirectory(lSourcePath, lDstnPath);
+		}
+		else
+		{
+			lImageRotator.rotateFile(lSourcePath, lDstnPath);
+		}
 	}
 }
